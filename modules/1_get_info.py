@@ -1,6 +1,7 @@
-import load_django
-from parser_app.models import Product
+"""The script collects product data and stores it in a Postgres database."""
 
+from load_django import *
+from parser_app.models import *
 from selenium import webdriver
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
@@ -121,6 +122,32 @@ try:
     product_info['characteristics'] = spec
 
     pprint(product_info, sort_dicts=False)
+
+
+    data_to_save = {
+        "full_name": product_info["full_name"],
+        "product_code": product_info["product_code"],
+        "main_price": product_info["main_price"],
+        "red_price": product_info["red_price"],
+        "color": product_info["color"],
+        "memory": product_info["memory"],
+        "producer": product_info["producer"],
+        "screen_diagonal": product_info["diagonal"],
+        "display_resolution": product_info["resolution"],
+        "characteristics": product_info["characteristics"],
+        "image": product_info["images"],
+        "review_count": product_info["review_count"]
+    }
+
+    try:
+        obj, created = Product.objects.get_or_create(**data_to_save)
+        status = "created" if created else "already exists"
+        print(f"{obj.full_name} ({obj.product_code}) ({status})")
+    except Product.MultipleObjectsReturned:
+        print("Multiple products found")
+
+
+
 
 
 
