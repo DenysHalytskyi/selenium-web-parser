@@ -48,7 +48,7 @@ try:
         product_info['full_name'] = full_name
 
     except NoSuchElementException as e:
-        print("Error: ", e)
+        product_info['full_name'] = None
 
 
     try:    #product code
@@ -56,21 +56,21 @@ try:
         product_code = load_product_code.get_attribute("textContent").strip()
         product_info['product_code'] = product_code
     except NoSuchElementException as e:
-        print("Error: ", e)
+        product_info['product_code'] = None
 
 
     try:    #main price
         main_price = driver.find_element(By.XPATH, '//div[contains(@class, "pr-op")]//span').text.replace(' ', '')
         product_info['main_price'] = int(main_price)
     except NoSuchElementException as e:
-        print("Error: ", e)
+        product_info['main_price'] = None
 
 
     try:    #red price
         red_price = driver.find_element(By.XPATH, '//div[contains(@class, "pr-np")]//span').text.replace(' ', '')
         product_info['red_price'] = int(red_price)
     except NoSuchElementException as e:
-        print("Error: ", e)
+        product_info['red_price'] = None
 
 
     try:    #review count
@@ -78,7 +78,7 @@ try:
         review_count = ''.join(filter(str.isdigit, review))
         product_info['review_count'] = int(review_count)
     except NoSuchElementException as e:
-        print("Error: ", e)
+        product_info['review_count'] = None
 
 
     #images
@@ -90,7 +90,7 @@ try:
             images_list.append(src)
 
     if not images_list:
-        print("No images found")
+        product_info['images'] = None
     else:
         product_info['images'] = images_list
 
@@ -108,18 +108,33 @@ try:
                 if key:
                     spec[key] = " ".join(value.split())
 
-
+        product_info['characteristics'] = spec
 
     except NoSuchElementException as e:
-        print("Error: ", e)
+        product_info['characteristics'] = None
 
 
-    product_info['color'] = spec['Колір']
-    product_info['memory'] = spec["Вбудована пам'ять"]
-    product_info['producer'] = spec['Виробник']
-    product_info['diagonal'] = spec['Діагональ екрану']
-    product_info['resolution'] = spec['Роздільна здатність екрану']
-    product_info['characteristics'] = spec
+    try:
+        product_info['color'] = spec['Колір']
+    except AttributeError as e:
+        product_info['color'] = None
+    try:
+        product_info['memory'] = spec["Вбудована пам'ять"]
+    except AttributeError as e:
+        product_info['memory'] = None
+    try:
+        product_info['producer'] = spec['Виробник']
+    except AttributeError as e:
+        product_info['producer'] = None
+    try:
+        product_info['diagonal'] = spec['Діагональ екрану']
+    except AttributeError as e:
+        product_info['diagonal'] = None
+    try:
+        product_info['resolution'] = spec['Роздільна здатність екрану']
+    except AttributeError as e:
+        product_info['resolution'] = None
+
 
     pprint(product_info, sort_dicts=False)
 
@@ -145,11 +160,6 @@ try:
         print(f"{obj.full_name} ({obj.product_code}) ({status})")
     except Product.MultipleObjectsReturned:
         print("Multiple products found")
-
-
-
-
-
 
 except NoSuchElementException as e:
     print(f"Error + {e}")
