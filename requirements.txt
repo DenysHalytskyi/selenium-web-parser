@@ -1,0 +1,4 @@
+django
+selenium
+webdriver-manager
+psycopg2-binary
